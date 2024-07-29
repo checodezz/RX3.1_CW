@@ -23,7 +23,15 @@ export const postSlice = createSlice({
       },
     ],
   },
-  reducers: {},
+  reducers: {
+    likeButtonPressed: (state, action) => {
+      const postIndex = state.posts.findIndex(
+        (post) => post.postId === action.payload
+      );
+      state.posts[postIndex].likes += 1;
+    },
+  },
 });
 
+export const { likeButtonPressed } = postSlice.actions;
 export default postSlice.reducer;

@@ -1,27 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+export const fetchPost = createAsyncThunk("posts/fetchPosts", async () => {
+  const response = await axios.get(
+    "https://social-media-cw-server-student-neog.replit.app/posts"
+  );
+  return response.data;
+});
+
 export const postSlice = createSlice({
   name: "posts",
   initialState: {
-    posts: [
-      {
-        postId: "P001",
-        caption: "Learning Redux Toolkit",
-        likes: 22,
-        user: {
-          userId: "user123",
-          userName: "John Doe",
-        },
-      },
-      {
-        postId: "P002",
-        caption: "It is fun to learn redux toolkit",
-        likes: 18,
-        user: {
-          userId: "user123",
-          userName: "John Doe",
-        },
-      },
-    ],
+    posts: [],
+    status: "idle",
+    error: null,
   },
   reducers: {
     likeButtonPressed: (state, action) => {
@@ -30,6 +21,21 @@ export const postSlice = createSlice({
       );
       state.posts[postIndex].likes += 1;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchPost.pending, (state) => {
+      state.status = "loading";
+    });
+
+    builder.addCase(fetchPost.fulfilled, (state, action) => {
+      state.status = "success";
+      state.posts = action.payload.posts;
+    });
+
+    builder.addCase(fetchPost.rejected, (state, action) => {
+      state.status = "error";
+      state.error = action.payload.message;
+    });
   },
 });
 
